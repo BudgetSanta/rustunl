@@ -1,47 +1,48 @@
+mod app;
+mod data;
+mod ui;
+
+use std::{error::Error, io, time::Duration};
+
 use clap::Clap;
-use commands::Opts;
-use simplelog::{Config, LevelFilter, TermLogger, TerminalMode};
-use std::error::Error;
+use termion::{input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
+use tui::{backend::TermionBackend, Terminal};
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let opts = Opts::parse();
+use app::event::{Config, Events};
+use app::{action_event, App};
 
-    let log_level = if opts.debug {
-        LevelFilter::Debug
-    } else if opts.quiet {
-        LevelFilter::Error
-    } else {
-        LevelFilter::Info
-    };
-
-    TermLogger::init(
-        log_level,
-        Config::default(),
-        TerminalMode::Mixed,
-        simplelog::ColorChoice::Always,
-    )?;
-
-    Ok(())
+/// Rustunl - A Rust Pritunl TUI
+#[derive(Clap)]
+struct Opts {
+    /// Time in ms between two ticks.
+    #[clap(short, long, default_value = "250")]
+    tick_rate: u64,
 }
 
-mod commands {
-    use clap::Clap;
-    #[derive(Clap)]
-    pub struct Opts {
-        /// Supresses normal output
-        #[clap(short, long)]
-        pub quiet: bool,
+fn main() -> Result<(), Box<dyn Error>> {
+    let opts: Opts = Opts::parse();
 
-        /// Prints out debug messages
-        #[clap(short, long)]
-        pub debug: bool,
+    let events = Events::with_config(Config {
+        tick_rate: Duration::from_millis(opts.tick_rate),
+        ..Config::default()
+    });
 
-        #[clap(subcommand)]
-        pub subcmd: SubCommand,
+    let stdout = io::stdout().into_raw_mode()?;
+    let stdout = MouseTerminal::from(stdout);
+    let stdout = AlternateScreen::from(stdout);
+    let backend = TermionBackend::new(stdout);
+    let mut terminal = Terminal::new(backend)?;
+
+    let mut app = App::new("Rustunl", true);
+    loop {
+        terminal.draw(|f| ui::draw(f, &mut app))?;
+
+        action_event(&mut app, events.next()?);
+
+        if app.should_quit {
+            break;
+        }
     }
 
-    #[derive(Clap)]
-    pub enum SubCommand {
-        Connect,
-    }
+    Ok(())
 }

@@ -1,5 +1,5 @@
 [package]
-name = "connect"
+name = "rustunl"
 version = "0.1.0"
 authors = ["Jared Steiner <steiner.jared1996@gmail.com>"]
 edition = "2018"
@@ -10,3 +10,6 @@ edition = "2018"
 clap = "3.0.0-beta.2"
 log = "0.4.14"
 simplelog = "0.10.0"
+tui = "0.15.0"
+termion = "1.5"
+rand = "0.8"
