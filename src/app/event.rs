@@ -6,6 +6,8 @@ use std::time::Duration;
 use termion::event::Key;
 use termion::input::TermRead;
 
+use super::state::App;
+
 pub enum Event<I> {
     Input(I),
     Tick,
@@ -71,5 +73,37 @@ impl Events {
 
     pub fn next(&self) -> Result<Event<Key>, mpsc::RecvError> {
         self.rx.recv()
+    }
+}
+
+pub fn action_event(app: &mut App, ev: Event<Key>) {
+    match ev {
+        Event::Input(key) => match key {
+            Key::Char(c) => {
+                app.on_key(c);
+            }
+            Key::Up => {
+                app.on_up();
+            }
+            Key::Down => {
+                app.on_down();
+            }
+            Key::Left => {
+                app.on_left();
+            }
+            Key::Right => {
+                app.on_right();
+            }
+            Key::Ctrl(c) => {
+                app.on_ctrl_key(c);
+            }
+            Key::Esc => {
+                app.on_esc();
+            }
+            _ => {}
+        },
+        Event::Tick => {
+            app.on_tick();
+        }
     }
 }

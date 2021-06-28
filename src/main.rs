@@ -1,6 +1,6 @@
 mod app;
-mod data;
-mod ui;
+use app::state::App;
+use rustunl::pritunl::Rustunl;
 
 use std::{error::Error, io, time::Duration};
 
@@ -8,8 +8,10 @@ use clap::Clap;
 use termion::{input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{backend::TermionBackend, Terminal};
 
-use app::event::{Config, Events};
-use app::{action_event, App};
+use app::{
+    event::{action_event, Config, Events},
+    render,
+};
 
 /// Rustunl - A Rust Pritunl TUI
 #[derive(Clap)]
@@ -33,9 +35,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let backend = TermionBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let mut app = App::new("Rustunl", true);
+    let r = Rustunl::new();
+
+    let mut app = App::new(&r, "Rustunl", true);
     loop {
-        terminal.draw(|f| ui::draw(f, &mut app))?;
+        terminal.draw(|f| render::draw(f, &mut app))?;
 
         action_event(&mut app, events.next()?);
 

@@ -1,5 +1,3 @@
-use crate::app::App;
-
 use tui::{
     backend::Backend,
     layout::{Constraint, Direction, Layout, Rect},
@@ -8,6 +6,8 @@ use tui::{
     widgets::{Block, Borders, Cell, Paragraph, Row, Table, Tabs},
     Frame,
 };
+
+use super::state::App;
 
 pub fn draw<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     // Create the Initial App Layout
