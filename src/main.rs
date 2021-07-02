@@ -1,6 +1,6 @@
 mod app;
 use app::state::App;
-use rustunl::pritunl::Rustunl;
+use pritunl::Client;
 
 use std::{error::Error, io, time::Duration};
 
@@ -35,9 +35,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let backend = TermionBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let r = Rustunl::new();
-
-    let mut app = App::new(&r, "Rustunl", true);
+    let mut app = App::new( "Rustunl", true);
     loop {
         terminal.draw(|f| render::draw(f, &mut app))?;
 

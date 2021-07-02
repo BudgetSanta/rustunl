@@ -91,11 +91,11 @@ where
     // Table Values
     let rows = app.profiles.items.iter().map(|p| {
         Row::new(vec![
-            p.id,
-            p.name,
-            p.status,
-            p.server_address,
-            p.client_address,
+            p.id.clone(),
+            p.name.clone(),
+            p.status.clone(),
+            p.server_address.clone(),
+            p.client_address.clone(),
         ])
     });
 
@@ -108,7 +108,7 @@ where
         )
         .highlight_style(selected_style)
         .widths(&[
-            Constraint::Ratio(2, 8),
+            Constraint::Ratio(1, 8),
             Constraint::Ratio(2, 8),
             Constraint::Ratio(1, 8),
             Constraint::Ratio(1, 8),

@@ -1,32 +1,33 @@
-use rustunl::pritunl::Rustunl;
-
-use crate::app::data::profile_data;
+use pritunl::Client;
 
 use super::components::{tab::TabsState, table::StatefulTable};
+use crate::app::data::profile_data;
 
-pub struct TableProfile<'a> {
-    pub id: &'a str,
-    pub name: &'a str,
-    pub status: &'a str,
-    pub server_address: &'a str,
-    pub client_address: &'a str,
+pub struct TableProfile {
+    pub id: String,
+    pub name: String,
+    pub status: String,
+    pub server_address: String,
+    pub client_address: String,
 }
 
 pub struct App<'a> {
     pub title: &'a str,
+    pub client: Client,
     pub should_quit: bool,
     pub tabs: TabsState<'a>,
-    pub profiles: StatefulTable<TableProfile<'a>>,
+    pub profiles: StatefulTable<TableProfile>,
     pub enhanced_graphics: bool,
 }
 
 impl<'a> App<'a> {
-    pub fn new(r: &'a Rustunl, title: &'a str, enhanced_graphics: bool) -> App<'a> {
+    pub fn new(title: &'a str, enhanced_graphics: bool) -> App<'a> {
         App {
             title,
+            client: Client::new(),
             should_quit: false,
             tabs: TabsState::new(vec!["Profiles"]),
-            profiles: StatefulTable::with_items(profile_data(r)),
+            profiles: StatefulTable::with_items(vec![]),
             enhanced_graphics,
         }
     }
@@ -67,5 +68,7 @@ impl<'a> App<'a> {
         self.profiles.unselect();
     }
 
-    pub fn on_tick(&mut self) {}
+    pub fn on_tick(&mut self) {
+        self.profiles.set_items(profile_data(&self.client));
+    }
 }

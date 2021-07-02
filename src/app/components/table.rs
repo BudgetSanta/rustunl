@@ -22,9 +22,10 @@ impl<T> StatefulTable<T> {
 
     pub fn set_items(&mut self, items: Vec<T>) {
         self.items = items;
+
         // We reset the state as the associated items have changed. This effectively reset
         // the selection as well as the stored offset.
-        self.state = TableState::default();
+        //self.state = TableState::default();
     }
 
     pub fn unselect(&mut self) {
